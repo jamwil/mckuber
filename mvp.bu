@@ -1,0 +1,16 @@
+# To transpile:
+# butane -pso mvp.ign mvp.bu
+
+variant: fcos
+version: 1.4.0
+passwd:
+  users:
+  - name: core
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINHWev7P63gEwqGm6TNGd5Dpydp5TKZpKIwIdfCjx88l james@kananlabs.org
+storage:
+  files:
+    - path: /etc/hostname
+      mode: 0644
+      contents:
+        inline: localhost
