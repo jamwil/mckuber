@@ -13,7 +13,7 @@ storage:
     - path: /etc/hostname
       mode: 0644
       contents:
-        inline: localhost
+        inline: $HOSTNAME
     - path: /etc/yum.repos.d/tailscale.repo
       mode: 0644
       contents:
@@ -30,4 +30,19 @@ systemd:
   units:
     - name: rpm-ostree-install-tailscale.service
       enabled: true
-      contents_local: rpm-ostree-install-tailscale.service
+      contents: |
+        [Unit]
+        Description=Install Tailscale stable
+        Wants=network-online.target
+        After=network-online.target
+        Before=zincati.service
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStartPre=rpm-ostree install --apply-live --allow-inactive --assumeyes tailscale
+        ExecStartPre=systemctl enable --now tailscaled
+        ExecStart=tailscale up --auth-key $TSKEY
+
+        [Install]
+        WantedBy=multi-user.target
