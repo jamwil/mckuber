@@ -36,6 +36,9 @@ systemd:
         Wants=network-online.target
         After=network-online.target
         Before=zincati.service
+        Before=first-boot-complete.target
+        Wants=first-boot-complete.target
+        ConditionFirstBoot=yes
 
         [Service]
         Type=oneshot
