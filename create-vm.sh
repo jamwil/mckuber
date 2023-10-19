@@ -14,7 +14,7 @@ HOSTNAME="$2"
 # Create the ignition file
 tmp_ign_file=$(mktemp)
 trap 'rm -f "$tmp_ign_file"' EXIT
-envsubst '$HOSTNAME $TSKEY' < "$BUTANEFILE" | butane -ps -d contents -o "$tmp_ign_file"
+envsubst '$PASSWORD $HOSTNAME $TSKEY' < "$BUTANEFILE" | butane -ps -d contents -o "$tmp_ign_file"
 
 IGNITION_DEVICE_ARG=(--qemu-commandline="-fw_cfg name=opt/com.coreos/config,file=${tmp_ign_file}")
 
