@@ -15,6 +15,10 @@ storage:
       mode: 0644
       contents:
         inline: $HOSTNAME
+    - path: /etc/sysctl.d/90-sysrq.conf
+      mode: 0644
+      contents:
+        inline: kernel.sysrq = 128
     - path: /etc/yum.repos.d/tailscale.repo
       mode: 0644
       contents:
