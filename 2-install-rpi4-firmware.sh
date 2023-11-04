@@ -26,7 +26,7 @@ done
 sudo mount "$FCOSEFIPARTITION" "$TEMP_DIR" 
 trap 'sudo umount "$TEMP_DIR" || true; rm -rf "$TEMP_DIR"' EXIT
 pushd "$TEMP_DIR"
-VERSION=v1.34  # use latest one from https://github.com/pftf/RPi4/releases
+VERSION=v1.34
 sudo curl -LO "https://github.com/pftf/RPi4/releases/download/${VERSION}/RPi4_UEFI_Firmware_${VERSION}.zip" \
 && sudo unzip "RPi4_UEFI_Firmware_${VERSION}.zip" \
 && sudo rm "RPi4_UEFI_Firmware_${VERSION}.zip"
