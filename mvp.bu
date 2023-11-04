@@ -36,16 +36,43 @@ storage:
           repo_gpgcheck=1
           gpgcheck=0
           gpgkey=https://pkgs.tailscale.com/stable/fedora/repo.gpg
-systemd: # TODO Combine the ostree install into a single unit
+    - path: /etc/yum.repos.d/kubernetes.repo
+      mode: 0644
+      contents:
+        inline: |
+          [kubernetes]
+          name=Kubernetes
+          baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
+          enabled=1
+          gpgcheck=1
+          gpgkey=https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg          
+    - path: /etc/yum.repos.d/rancher-k3s-common.repo
+      mode: 0644
+      contents:
+        inline: |
+          [rancher-k3s-common-stable]
+          name=Rancher K3s Common (stable)
+          baseurl=https://rpm.rancher.io/k3s/stable/common/centos/8/noarch
+          enabled=1
+          gpgcheck=1
+          repo_gpgcheck=0
+          gpgkey=https://rpm.rancher.io/public.key
+    - path: /usr/local/bin/k3s
+      overwrite: true
+      mode: 0755
+      contents:
+        source: "https://github.com/k3s-io/k3s/releases/download/v1.28.3%2Bk3s1/k3s-arm64"
+        verification:
+          hash: "sha256-1599bcc82cc0d9b8e0874b037141fa902bb1ce2e38e1a78f6853e60cab3b28e8"
+systemd:
   units:
-    - name: rpm-ostree-install-vim.service
+    - name: bootstrap-system.service
       enabled: true
       contents: |
         [Unit]
-        Description=Layer vim with rpm-ostree
+        Description=Bootstrap the system with tailscale
         Wants=network-online.target
         After=network-online.target
-        Before=rpm-ostree-install-tailscale.service
         Before=zincati.service
         Before=first-boot-complete.target
         Wants=first-boot-complete.target
@@ -54,29 +81,38 @@ systemd: # TODO Combine the ostree install into a single unit
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=rpm-ostree install --apply-live --allow-inactive --assumeyes vim
-
-        [Install]
-        WantedBy=multi-user.target
-    - name: rpm-ostree-install-tailscale.service
-      enabled: true
-      contents: |
-        [Unit]
-        Description=Install Tailscale stable
-        Wants=network-online.target
-        After=network-online.target
-        After=rpm-ostree-install-vim.service
-        Before=zincati.service
-        Before=first-boot-complete.target
-        Wants=first-boot-complete.target
-        ConditionFirstBoot=yes
-
-        [Service]
-        Type=oneshot
-        RemainAfterExit=yes
-        ExecStartPre=rpm-ostree install --apply-live --allow-inactive --assumeyes tailscale
-        ExecStartPre=systemctl enable --now tailscaled
+        ExecStart=rpm-ostree install --apply-live --allow-inactive --assumeyes vim tailscale kubectl k3s-selinux
+        ExecStart=systemctl enable --now tailscaled
         ExecStart=tailscale up --auth-key $TSKEY
 
         [Install]
         WantedBy=multi-user.target
+    - name: "k3s.service"
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Run K3s
+        Wants=network-online.target
+        After=network-online.target
+        After=bootstrap-system.service
+
+        [Service]
+        Type=notify
+        EnvironmentFile=-/etc/default/%N
+        EnvironmentFile=-/etc/sysconfig/%N
+        EnvironmentFile=-/etc/systemd/system/%N.env
+        KillMode=process
+        Delegate=yes
+        LimitNOFILE=1048576
+        LimitNPROC=infinity
+        LimitCORE=infinity
+        TasksMax=infinity
+        TimeoutStartSec=0
+        Restart=always
+        RestartSec=5s
+        ExecStartPre=-/sbin/modprobe br_netfilter
+        ExecStartPre=-/sbin/modprobe overlay
+        ExecStart=/usr/local/bin/k3s server
+
+        [Install]
+        WantedBy=multi-user.target  
