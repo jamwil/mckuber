@@ -65,6 +65,14 @@ storage:
         source: "https://github.com/k3s-io/k3s/releases/download/v1.27.7%2Bk3s1/k3s-arm64"
         verification:
           hash: "sha256-a7f276a87f90119506ef47df521736976758fd3da349a3a1d565cace6562c60b"
+    - path: /etc/rancher/k3s/kubelet.config
+      mode: 0644
+      contents:
+        inline: |
+          apiVersion: kubelet.config.k8s.io/v1beta1
+          kind: KubeletConfiguration
+          shutdownGracePeriod: 60s
+          shutdownGracePeriodCriticalPods: 10s
 systemd:
   units:
     - name: bootstrap-system.service
@@ -115,7 +123,7 @@ systemd:
         RestartSec=5s
         ExecStartPre=-/sbin/modprobe br_netfilter
         ExecStartPre=-/sbin/modprobe overlay
-        ExecStart=/usr/local/bin/k3s agent --vpn-auth="$K3S_VPN_AUTH"
+        ExecStart=/usr/local/bin/k3s agent --vpn-auth="$K3S_VPN_AUTH" --kubelet-arg="config=/etc/rancher/k3s/kubelet.config"
 
         [Install]
         WantedBy=multi-user.target
