@@ -17,7 +17,7 @@ STREAM=stable  # or `next` or `testing`
 # Create the ignition file
 tmp_ign_file=$(mktemp)
 trap 'rm -f "$tmp_ign_file"' EXIT
-envsubst '$PASSWORD $HOSTNAME $TSKEY' < "$BUTANEFILE" | butane -ps -d contents -o "$tmp_ign_file"
+envsubst '$PASSWORD $HOSTNAME $TSKEY $K3S_URL $K3S_TOKEN $K3S_VPN_AUTH' < "$BUTANEFILE" | butane -ps -d contents -o "$tmp_ign_file"
 
 # Create the partitions on the target disk
 sudo coreos-installer install -a aarch64 -s "$STREAM" -i "$tmp_ign_file" "$FCOSDISK"
