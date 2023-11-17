@@ -90,7 +90,7 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=rpm-ostree install --apply-live --allow-inactive --assumeyes vim tailscale kubectl k3s-selinux
+        ExecStart=rpm-ostree install --apply-live --allow-inactive --assumeyes vim tailscale kubectl k3s-selinux nfs-utils
         ExecStart=systemctl enable --now tailscaled
         ExecStart=tailscale up --auth-key $TSKEY
 
