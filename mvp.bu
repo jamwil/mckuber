@@ -43,10 +43,10 @@ storage:
         inline: |
           [kubernetes]
           name=Kubernetes
-          baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
+          baseurl=https://pkgs.k8s.io/core:/stable:/v1.31/rpm/
           enabled=1
           gpgcheck=1
-          gpgkey=https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg          
+          gpgkey=https://pkgs.k8s.io/core:/stable:/v1.31/rpm/repodata/repomd.xml.key
     - path: /etc/yum.repos.d/rancher-k3s-common.repo
       mode: 0644
       contents:
@@ -62,9 +62,9 @@ storage:
       overwrite: true
       mode: 0755
       contents:
-        source: "https://github.com/k3s-io/k3s/releases/download/v1.27.7%2Bk3s2/k3s-arm64"
+        source: "https://github.com/k3s-io/k3s/releases/download/v1.31.2%2Bk3s1/k3s-arm64"
         verification:
-          hash: "sha256-63542b5b4430d3d439c643b25e33e65a975181a658345822049cb8c2cd82eea5"
+          hash: "sha256-a9c4cdb7f038ea46f84bdf1b5c1e518637a8bdf84c39f281a6400bc7e9d8f9f0"
     - path: /etc/rancher/k3s/kubelet.config
       mode: 0644
       contents:
@@ -90,9 +90,8 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=rpm-ostree install --apply-live --allow-inactive --assumeyes vim tailscale kubectl k3s-selinux nfs-utils
+        ExecStart=rpm-ostree install --apply-live --allow-inactive --assumeyes vim tailscale kubectl k3s-selinux nfs-utils-coreos
         ExecStart=systemctl enable --now tailscaled
-        ExecStart=tailscale up --auth-key $TSKEY
 
         [Install]
         WantedBy=multi-user.target
