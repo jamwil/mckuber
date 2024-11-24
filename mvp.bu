@@ -62,9 +62,9 @@ storage:
       overwrite: true
       mode: 0755
       contents:
-        source: "https://github.com/k3s-io/k3s/releases/download/v1.31.2%2Bk3s1/k3s-arm64"
+        source: "https://github.com/k3s-io/k3s/releases/download/v1.30.6%2Bk3s1/k3s-arm64"
         verification:
-          hash: "sha256-a9c4cdb7f038ea46f84bdf1b5c1e518637a8bdf84c39f281a6400bc7e9d8f9f0"
+          hash: "sha256-d6a4aac2945bf7a757b87a56f41b49c500ed5d4ccc2b42284ebfbd3cd1a25162"
     - path: /etc/rancher/k3s/kubelet.config
       mode: 0644
       contents:
