@@ -12,7 +12,7 @@ fi
 FCOSDISK="$1"
 BUTANEFILE="$2"
 HOSTNAME="$3"
-STREAM=next  # or `next` or `testing`
+STREAM=stable  # or `next` or `testing`
 
 # Create the ignition file
 tmp_ign_file=$(mktemp)

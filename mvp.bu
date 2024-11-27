@@ -71,8 +71,8 @@ storage:
         inline: |
           apiVersion: kubelet.config.k8s.io/v1beta1
           kind: KubeletConfiguration
-          shutdownGracePeriod: 60s
-          shutdownGracePeriodCriticalPods: 10s
+          shutdownGracePeriod: 90s
+          shutdownGracePeriodCriticalPods: 30s
 systemd:
   units:
     - name: bootstrap-system.service
@@ -91,7 +91,6 @@ systemd:
         Type=oneshot
         RemainAfterExit=yes
         ExecStart=rpm-ostree install --apply-live --allow-inactive --assumeyes vim tailscale kubectl k3s-selinux nfs-utils-coreos
-        ExecStart=systemctl enable --now tailscaled
 
         [Install]
         WantedBy=multi-user.target
@@ -120,6 +119,7 @@ systemd:
         TimeoutStartSec=0
         Restart=always
         RestartSec=5s
+        ExecStartPre=systemctl start tailscaled
         ExecStartPre=-/sbin/modprobe br_netfilter
         ExecStartPre=-/sbin/modprobe overlay
         ExecStart=/usr/local/bin/k3s agent --vpn-auth="$K3S_VPN_AUTH" --kubelet-arg="config=/etc/rancher/k3s/kubelet.config"
